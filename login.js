@@ -45,7 +45,19 @@ Login.prototype.logout = function(sessionId) {
    /*
 	* TODO: Remove the given sessionId from the sessionMap
 	*/
+//         delete request.session.sessionId;
+delete(this.sessionMap[sessionId]);
+//        this.sessionMap[sessionId].delete;
+	console.log('removed given session ID from sessionMap');	
+
 };
+Login.prototype.replaceId=function(sessionId){
+var cred= new Array();
+cred[0]= this.sessionMap[sessionId].name;
+cred[1]= this.sessionMap[sessionId].email;
+return cred;
+}
 
 // Export the Login class
 module.exports = new Login();
+
