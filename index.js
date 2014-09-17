@@ -1,6 +1,6 @@
-var connect = require('connect');
+connect = require('connect');
 var login = require('./login');
-
+var parseOwn= require('./parseOwn');
 var app = connect();
 
 app.use(connect.json()); // Parse JSON request body into `request.body`
@@ -37,15 +37,39 @@ function get(request, response) {
 
 function post(request, response) {
 	// TODO: read 'name and email from the request.body'
-	// var newSessionId = login.login('xxx', 'xxx@gmail.com');
+console.log("into post function\n");
+//var url = require('url');
+//console.log(url);
+//var url_parts = url.parse(request.url, true);
+//console.log(url_parts);
+//var query = url_parts.query;
+//console.log(query);
+// parseOwn.parsePost(request);
+console.log("logger name:"+request.body.name);
+console.log("logger email.:"+request.body.email);
+var newSessionId = login.login(request.body.name, request.body.email);
+console.log(newSessionId);
+response.setHeader('Set-Cookie', 'session_id=' + newSessionId);
+response.end(login.hello(newSessionId));
+   
+
 	// TODO: set new session id to the 'session_id' cookie in the response
+
+//	response.setHeader('Set-Cookie', 'session_id=' + newSessionId);
+//	response.end(login.hello(newSessionId));	
 	// replace "Logged In" response with response.end(login.hello(newSessionId));
 
-	response.end("Logged In\n");
+	
 };
 
 function del(request, response) {
 	console.log("DELETE:: Logout from the server");
+var cookies = request.cookies;
+ console.log(cookies);
+        if ('session_id' in cookies) {
+                var sid = cookies['session_id'];
+login.logout(sid);
+}
  	// TODO: remove session id via login.logout(xxx)
  	// No need to set session id in the response cookies since you just logged out!
 
@@ -55,10 +79,24 @@ function del(request, response) {
 function put(request, response) {
 	console.log("PUT:: Re-generate new seesion_id for the same user");
 	// TODO: refresh session id; similar to the post() function
+var cookies = request.cookies;
+ console.log(cookies);
+        if ('session_id' in cookies) {
+                var sid = cookies['session_id'];
 
-	response.end("Re-freshed session id\n");
+var cred_i=login.replaceId(sid);
+
+
+
+	
+var RefNewSessionId = login.login(cred_i[0], cred_i[1]);
+console.log(RefNewSessionId);
+response.setHeader('Set-Cookie', 'session_id=' + RefNewSessionId);
+response.end(login.hello(RefNewSessionId));
+}
 };
 
 app.listen(8000);
 
 console.log("Node.JS server running at 8000...");
+
